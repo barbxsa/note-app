@@ -1,5 +1,6 @@
 const initSqlJs = require('sql.js');
 const express   = require('express');
+const crypto    = require('crypto');
 const fs        = require('fs');
 const path      = require('path');
 
@@ -8,14 +9,41 @@ const PORT     = process.env.PORT || 8080;
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH  = path.join(DATA_DIR, 'notes.db');
 
+/* ── credenciais via variável de ambiente ── */
+const AUTH_USER = process.env.AUTH_USER || 'admin';
+const AUTH_PASS = process.env.AUTH_PASS || 'lembretes';
+const SECRET    = process.env.SESSION_SECRET || 'troque-este-valor-na-producao';
+
+/* ── cookie helpers ── */
+function makeToken() {
+  return crypto.createHmac('sha256', SECRET).update(AUTH_USER + ':' + AUTH_PASS).digest('hex');
+}
+
+function parseCookies(req) {
+  const out = {};
+  (req.headers.cookie || '').split(';').forEach(c => {
+    const [k, ...v] = c.trim().split('=');
+    if (k) out[k.trim()] = v.join('=');
+  });
+  return out;
+}
+
+/* ── middleware de autenticação ── */
+function requireAuth(req, res, next) {
+  if (req.path === '/login') return next();
+  const { auth } = parseCookies(req);
+  if (auth === makeToken()) return next();
+  if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Não autorizado' });
+  res.redirect('/login');
+}
+
+/* ── DB helpers ── */
 let db;
 
-/* Persiste o banco em disco após cada escrita */
 function saveDB() {
   fs.writeFileSync(DB_PATH, Buffer.from(db.export()));
 }
 
-/* SELECT múltiplas linhas */
 function all(sql, params = []) {
   const stmt = db.prepare(sql);
   stmt.bind(params);
@@ -25,12 +53,10 @@ function all(sql, params = []) {
   return rows;
 }
 
-/* SELECT uma linha */
 function get(sql, params = []) {
   return all(sql, params)[0] || null;
 }
 
-/* INSERT / UPDATE / DELETE */
 function run(sql, params = []) {
   db.run(sql, params);
   saveDB();
@@ -69,8 +95,34 @@ async function init() {
   saveDB();
 
   app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(requireAuth);
   app.use(express.static(path.join(__dirname, 'public')));
 
+  /* ── login ── */
+  app.get('/login', (req, res) => {
+    const { auth } = parseCookies(req);
+    if (auth === makeToken()) return res.redirect('/');
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  });
+
+  app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === AUTH_USER && password === AUTH_PASS) {
+      const token   = makeToken();
+      const maxAge  = 30 * 24 * 60 * 60; // 30 dias
+      res.setHeader('Set-Cookie', `auth=${token}; HttpOnly; SameSite=Strict; Max-Age=${maxAge}; Path=/`);
+      return res.redirect('/');
+    }
+    res.redirect('/login?error=1');
+  });
+
+  app.get('/logout', (req, res) => {
+    res.setHeader('Set-Cookie', 'auth=; HttpOnly; SameSite=Strict; Max-Age=0; Path=/');
+    res.redirect('/login');
+  });
+
+  /* ── API ── */
   app.get('/api/notes', (req, res) => {
     res.json(all('SELECT * FROM notes ORDER BY pinned DESC, createdAt DESC').map(rowToNote));
   });

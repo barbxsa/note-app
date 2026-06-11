@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar — Lembretes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background-color: #b08444;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.3'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(88deg, transparent 0, transparent 22px, rgba(90,55,10,.055) 22px, rgba(90,55,10,.055) 23px),
+        repeating-linear-gradient(4deg,  transparent 0, transparent 38px, rgba(200,155,80,.07) 38px, rgba(200,155,80,.07) 40px),
+        radial-gradient(ellipse at 25% 20%, #cc9a58 0%, #a87838 35%, #906428 60%, #c09050 100%);
+    }
+
+    .card {
+      background: #fff9f2;
+      border-radius: 18px;
+      padding: 40px 36px 34px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.18);
+      animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(.9) translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-icon {
+      font-size: 42px;
+      display: block;
+      margin-bottom: 8px;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.18); }
+    }
+
+    .brand h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 28px;
+      color: #5a3015;
+      text-shadow: 1px 2px 6px rgba(0,0,0,.12);
+    }
+
+    .brand p {
+      font-size: 13px;
+      font-weight: 700;
+      color: #a07850;
+      margin-top: 4px;
+    }
+
+    .error-msg {
+      background: #ffe8e8;
+      border: 1.5px solid #f5a0a0;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #c03030;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #9a6838;
+      margin-bottom: 5px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 2px solid #e8d5be;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #3a2010;
+      background: #fffaf4;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .field input:focus {
+      border-color: #a40fdd;
+      box-shadow: 0 0 0 3px rgba(164,15,221,.13);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      background: linear-gradient(145deg, #c44aee, #a40fdd);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(164,15,221,.38);
+      transition: transform .16s, box-shadow .16s;
+      letter-spacing: .3px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(164,15,221,.48);
+    }
+
+    .btn-login:active { transform: scale(.97); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <h1>Lembretes</h1>
+      <p>Entre para ver seus lembretes</p>
+    </div>
+
+    <div id="errorMsg" class="error-msg" style="display:none">
+      Usuário ou senha incorretos.
+    </div>
+
+    <form method="POST" action="/login">
+      <div class="field">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" name="username" placeholder="seu usuário" autocomplete="username" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" placeholder="sua senha" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-login">Entrar</button>
+    </form>
+  </div>
+
+  <script>
+    if (new URLSearchParams(location.search).get('error')) {
+      document.getElementById('errorMsg').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
