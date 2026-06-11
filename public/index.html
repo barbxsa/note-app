@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lembretes SEMPRE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="brand">
+      <span class="brand-icon"></span>
+      <h1>Lembretes</h1>
+    </div>
+    <div class="search-wrap">
+      <input
+        type="search"
+        class="search-input"
+        id="search"
+        placeholder="Buscar lembrete..."
+        autocomplete="off"
+      >
+    </div>
+    <span class="counter" id="counter"></span>
+  </header>
+
+  <main class="board" id="board"></main>
+
+  <button class="fab" id="fab" title="Novo lembrete" aria-label="Adicionar lembrete">+</button>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose" aria-label="Fechar">✕</button>
+      <h2 id="modalHeading">Novo Lembrete</h2>
+
+      <div class="field">
+        <label for="fTitle">Título <span style="opacity:.5;font-weight:600;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input type="text" id="fTitle" placeholder="Ex: Não esqueça..." maxlength="80">
+      </div>
+
+      <div class="field">
+        <label for="fContent">Mensagem <span style="color:#a40fdd">*</span></label>
+        <textarea id="fContent" placeholder="O que ela disse?..." rows="4"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Cor do lembrete</label>
+        <div class="swatches" id="swatches">
+          <div class="swatch on"  data-color="#fff5b0" style="background:#fff5b0" title="Amarelo"></div>
+          <div class="swatch"     data-color="#ffd6ea" style="background:#ffd6ea" title="Rosa"></div>
+          <div class="swatch"     data-color="#c6f6d8" style="background:#c6f6d8" title="Verde-menta"></div>
+          <div class="swatch"     data-color="#e5d4ff" style="background:#e5d4ff" title="Lavanda"></div>
+          <div class="swatch"     data-color="#ffdec8" style="background:#ffdec8" title="Pêssego"></div>
+          <div class="swatch"     data-color="#c4e8ff" style="background:#c4e8ff" title="Azul-céu"></div>
+        </div>
+        <div class="preview-strip" id="preview" style="background:#fff5b0">Prévia do lembrete</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btnCancel">Cancelar</button>
+        <button class="btn-save"   id="btnSave">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
